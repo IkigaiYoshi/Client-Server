@@ -1,4 +1,4 @@
-//package org.suai.cs_2;
+package org.suai.cs_2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class ClientTCP {
 
         try {
 
-            socket = new Socket(ip,Integer.parseInt(port));
+            socket = new Socket(ip, Integer.parseInt(port));
             in = new BufferedReader(new InputStreamReader(socket.getInputStream())); //чтение из сокета
             out = new PrintWriter(socket.getOutputStream(), true); //запись
 
@@ -34,8 +34,8 @@ public class ClientTCP {
             String str = "";
             while (true) {
                 str = scan.nextLine();
-                if(str.contains("@exit")) break;
                 out.println(str);
+                if (str.contains("@exit")) break;
             }
             stream.setStopConnect();
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class ClientTCP {
         private boolean stopConnect;
 
 
-        public void setStopConnect() {
+        void setStopConnect() {
             stopConnect = true;
         }
 
@@ -73,7 +73,8 @@ public class ClientTCP {
                 //пока пользователь не отключился выводим все принятые сообщения
                 while (!stopConnect) {
                     String str = in.readLine();
-                    System.out.println(str);
+                    if (str != null)
+                        System.out.println(str);
                 }
             } catch (IOException e) {
                 System.out.println("Doh', error");

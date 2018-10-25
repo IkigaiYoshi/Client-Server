@@ -1,4 +1,4 @@
-//package org.suai.cs_2;
+package org.suai.cs_2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,10 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class ServerTCP {
@@ -60,11 +57,12 @@ public class ServerTCP {
         private BufferedReader in;
         private PrintWriter out;
         private Socket socket;
+        private List<String> blockList = new ArrayList<String>();
 
         private String name = "";
 
 
-        public ConnectionThread(Socket socket) {
+        ConnectionThread(Socket socket) {
             this.socket = socket;
 
             try {
@@ -99,17 +97,30 @@ public class ServerTCP {
                     if (str.equals("@exit")) break;
 
                     synchronized (connections) {
+                        if (str.contains("@blockuser")) {
+                            String[] nameUser = str.split(" ");
+                            if (nameUser.length < 2) continue;
+                            blockList.add(nameUser[1]);
+                            continue;
+                        }
+                        if (str.contains("@unblockuser")) {
+                            String[] nameUser = str.split(" ");
+                            if (nameUser.length < 2) continue;
+                            blockList.remove(nameUser[1]);
+
+                            continue;
+                        }
                         if (str.contains("@senduser")) { //внимание костыли
                             String[] data = str.split(" ");
                             if (data.length <= 2) continue;
                             str = str.substring(data[0].length() + data[1].length() + 2);
                             for (ConnectionThread connection : connections) {
-                                if (connection.name.equals(data[1]))
+                                if (connection.name.equals(data[1]) && !connection.blockList.contains(this.name))
                                     connection.out.println(name + ": " + str);
                             }
                         } else {
                             for (ConnectionThread connection : connections) {
-                                if (!(connection.name.equals(this.name)))
+                                if (!connection.name.equals(this.name) && !connection.blockList.contains(this.name))
                                     connection.out.println(name + ": " + str);
                             }
                         }
@@ -130,7 +141,7 @@ public class ServerTCP {
         }
 
 
-        public void close() {
+        void close() {
             try {
                 in.close();
                 out.close();

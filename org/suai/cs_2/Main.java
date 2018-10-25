@@ -1,4 +1,4 @@
-//package org.suai.cs_2;
+package org.suai.cs_2;
 
 
 import java.util.Scanner;
@@ -16,7 +16,7 @@ public class Main {
                 new ServerTCP(args[0]);
                 break;
             } else if (answer == 'c') {
-                new ClientTCP(args[0],args[1]);
+                new ClientTCP(args[0], args[1]);
                 break;
             } else {
                 System.out.println("Doh', error");
